@@ -20,36 +20,34 @@
 ## Лістинг функції insert-sort-recursive
 ```lisp
 (defun insert-sort-recursive (lst)
-  "Recursive insertion sort in non-decreasing order without auxiliary functions."
-  ;; If the list is empty, return an empty list as base case
+  "Recursive insertion sort with left linear search."
   (if (null lst)
       nil
-      ;; Sort the tail of the list recursively
       (let ((sorted-tail (insert-sort-recursive (cdr lst)))
-            (first (car lst)))
-        ;; Insert `first` into the sorted tail in the correct position
-        (if (or (null sorted-tail) (<= first (car sorted-tail)))
-            (cons first sorted-tail)
-            (cons (car sorted-tail)
-                  (insert-sort-recursive (cons first (cdr sorted-tail))))))))
+            (beg (car lst)))
+        (labels ((insert (element sorted)
+                   (if (null sorted)
+                       (list element)
+                       (let ((head (car sorted)))
+                         (if (<= element head)
+                             (cons element sorted)
+                             (cons head (insert element (cdr sorted))))))))
+          (insert beg sorted-tail)))))
 ```
 ## Лістинг функції insert-sort-imperative
 ```lisp
 (defun insert-sort-imperative (lst)
-  "Imperative insertion sort in non-decreasing order."
-  ;; Create a copy of the original list to preserve it
+  "Imperative insertion sort with left linear search."
   (let ((result (copy-list lst)))
-    ;; Traverse each element in the list, starting from the second one
     (loop for i from 1 below (length result)
-          do (let ((key (elt result i))  ; Save the current element as 'key'
-                   (j (1- i)))           ; Initialize the previous element index
-               ;; Shift elements while they are greater than 'key'
-               (loop while (and (>= j 0) (> (elt result j) key))
-                     do (setf (elt result (1+ j)) (elt result j)) ; Shift right
-                     do (decf j)) ; Move to the previous element
-               ;; Place 'key' at the correct position
-               (setf (elt result (1+ j)) key)))
-    result)) ; Return the sorted copy
+          do (let ((key (elt result i))  
+                   (j 0))                
+               (loop while (< (elt result j) key)
+                     do (incf j))
+               (loop for k from (1- i) downto j
+                     do (setf (elt result (1+ k)) (elt result k)))
+               (setf (elt result j) key)))
+    result))
 ```
 ### Тестові набори для insert-sort-recursive
 ```lisp
