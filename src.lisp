@@ -1,9 +1,8 @@
-(defun insert-sort-recursive (lst)
-  "Recursive insertion sort with left linear search."
+(defun insert-sort-recursive (lst &optional (acc nil))
+  "Tail-recursive insertion sort with left linear search."
   (if (null lst)
-      nil
-      (let ((sorted-tail (insert-sort-recursive (cdr lst)))
-            (beg (car lst)))
+      acc
+      (let ((beg (car lst)))
         (labels ((insert (element sorted)
                    (if (null sorted)
                        (list element)
@@ -11,7 +10,7 @@
                          (if (<= element head)
                              (cons element sorted)
                              (cons head (insert element (cdr sorted))))))))
-          (insert beg sorted-tail)))))
+          (insert-sort-recursive (cdr lst) (insert beg acc))))))
 
 
 
